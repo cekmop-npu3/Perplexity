@@ -3,8 +3,7 @@ from asyncio import run, sleep, get_running_loop
 from json import dumps, loads
 from re import search
 from uuid import uuid4
-
-from typing import Self, TypedDict, Optional, Union, Literal, Any
+from typing import Self, TypedDict
 
 
 class Text(TypedDict):
@@ -14,25 +13,6 @@ class Text(TypedDict):
     extra_web_results: list
 
 
-class Pending(TypedDict):
-    status: str
-    uuid: str
-    read_write_token: Optional[str]
-    frontend_context_uuid: str
-    text: Text
-    final: bool
-    backend_uuid: str
-    media_items: list
-    widget_data: list
-    knowledge_cards: list
-    expect_search_results: Union[bool, Literal['true', 'false']]
-    mode: str
-    search_focus: str
-    gpt4: bool
-    display_model: str
-    attachments: Optional[Any]
-
-
 class ChatMessage:
     def __init__(self, websocket: WebSocketClientProtocol, prompt: str, index: int, chat_data: dict) -> None:
         self.websocket = websocket
@@ -40,17 +20,16 @@ class ChatMessage:
         self.index = index
         self.chatData = chat_data
 
-    async def pending(self) -> Pending:
+    async def pending(self) -> Text:
         await self.websocket.send(
             f'{self.index}{dumps(["perplexity_ask", self.prompt, {"source": "android", "version": "2.3", "frontend_uuid": str(uuid4()), "use_inhouse_model": False, "conversational_enabled": True, "android_device_id": "cc199ca91e009c93", "mode": "concise", "search_focus": "internet", "is_related_query": False, "timezone": "Africa/Nairobi", "language": "ru-RU"} | self.chatData])}'
         )
         while True:
-            if (message := await self.websocket.recv()).split('[')[0] == '42':
-                yield loads(search(r'\d+(.+)', message).group(1))[1]
-                await sleep(2)
+            message = await self.websocket.recv()
+            if message.split('[')[0] == '42':
+                yield loads(loads(search(r'\d+(.+)', str(message)).group(1))[1].get('text'))
             elif message == '2':
                 await self.websocket.send('3')
-                continue
             else:
                 await self.websocket.recv()
                 await self.websocket.send('3')
@@ -112,10 +91,9 @@ class Perplexity:
 
 async def main():
     async with Perplexity() as chat:
-        async for message in chat('Сколько будет 2 + 2'):
+        async for message in chat('Напиши историю на русском'):
             print(message)
-        await sleep(60)
-        async for message in chat('Как тебя зовут'):
+        async for message in chat('Сколько будет 2 + 2'):
             print(message)
         async for message in chat('Что я тебя до этого спросил'):
             print(message)
