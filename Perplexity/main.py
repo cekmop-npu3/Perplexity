@@ -74,7 +74,7 @@ class Messages:
         while True:
             message = await self.connector.websocket.recv()
             if message.split('[')[0] == '42':
-                yield loads(loads(search(r'\d+(.+)', str(message)).group(1))[1].get('text'))
+                yield loads(loads(search(r'\d+(.+)', str(message)).group(1))[1].get('text')).get('answer')
             elif message == '2':
                 await self.connector.websocket.send('3')
             else:
