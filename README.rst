@@ -1,6 +1,8 @@
 Perplexity
 ==========
 
+Async wrapper for `Perplexity android app <https://play.google.com/store/apps/details?id=ai.perplexity.app.android&hl=ru&pli=1>`_ api.
+
 Quick Example
 -------------
 
