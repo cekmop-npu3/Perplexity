@@ -15,7 +15,7 @@ __all__ = (
 
 
 class Connector:
-    def __init__(self, token: str, chatId: str = None) -> None:
+    def __init__(self, token: Optional[str] = None, chatId: Optional[str] = None) -> None:
         self.token = token
         self.chatId = chatId
         self.websocket: Optional[WebSocketClientProtocol] = None
@@ -27,10 +27,11 @@ class Connector:
             extra_headers=Data.headers
         )
         await self.websocket.recv()
-        await self.websocket.send(f'40{dumps({"perplexity_jwt": self.token})}')
+        await self.websocket.send(f'40{dumps({"perplexity_jwt": self.token}) if self.token else ""}')
         if (await self.websocket.recv()).startswith('44'):
             raise ValueError('Invalid auth token')
-        await self.websocket.recv()
+        if self.token:
+            await self.websocket.recv()
         if self.chatId:
             await self.websocket.send(
                 f'420{dumps(["get_thread_by_uuid", self.chatId, Data.source | {"with_parent_info": True}])}'
@@ -88,7 +89,7 @@ class Messages:
 
 
 class Perplexity:
-    def __init__(self, *, token: str, chatId: str = None, searchFocus: Literal['internet', 'scholar', 'writing', 'wolfram', 'youtube', 'reddit'] = 'internet', deleteChat: bool = False) -> None:
+    def __init__(self, *, token: Optional[str] = None, chatId: Optional[str] = None, searchFocus: Literal['internet', 'scholar', 'writing', 'wolfram', 'youtube', 'reddit'] = 'internet', deleteChat: bool = False) -> None:
         self.connector = Connector(token, chatId)
         self.searchFocus = searchFocus
         self.deleteChat = deleteChat
