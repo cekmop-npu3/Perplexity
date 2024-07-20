@@ -40,7 +40,7 @@ Usage
 
     TOKEN=eyJhbGciOiJkaXIiLCJlb...
 
-2. Create main.py file and run it
+2. Create .py file and run it
 
 .. code:: py
 
