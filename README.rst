@@ -34,13 +34,13 @@ Installing
 Usage
 -------------
 
-1. Create .env file in your project and paste in your token
+1. [OPTIONAL] Create .env file in your project and paste in your token
 
 .. code:: py
 
     TOKEN=eyJhbGciOiJkaXIiLCJlb...
 
-2. Create .py file and run it
+2. Create .py file and run it. It also can be used without token
 
 .. code:: py
 
