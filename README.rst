@@ -12,7 +12,7 @@ Installing
 
 .. code:: sh
 
-    git clone https://github.com/cekmop-npu3/PerplexityProject.git
+    git clone https://github.com/cekmop-npu3/PerplexityAi.git
 
 2. Create virtual environment and activate it
 
